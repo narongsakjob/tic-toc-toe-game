@@ -59,10 +59,18 @@ public class MultiPlayerGui extends JFrame implements Observer {
 
 	public void startServer() {
 		// TODO: Complete the logic here
+		gameServer.start();
+		isServer = true;
+		startServerButton.setEnabled(false);
+		startClientButton.setEnabled(false);
 	}
 
 	public void startClient() {
 		// TODO: Complete the logic here
+		gameClient.connect();
+		isClient = true;
+		startServerButton.setEnabled(false);
+		startClientButton.setEnabled(false);
 	}
 
 	private void initComponents() {
@@ -144,6 +152,21 @@ public class MultiPlayerGui extends JFrame implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
+		
+//		gameClient.deleteObservers();
+//		gameServer.notifyObservers(arg);
+//		gameClient.addObserver(this);
+//		gameServer.send(arg);
+//		game.start();
+//		refreshGui();
+		
+		if(arg.equals(Network.CONNECT)){
+			game.start();
+		}else{
+			game = (Game)arg;
+			refreshGui();
+		}
+		
 		// TODO: Complete the logic here
 	}
 
@@ -165,7 +188,14 @@ public class MultiPlayerGui extends JFrame implements Observer {
 		public void mousePressed(MouseEvent e) {
 			int row = e.getY() / squareSize();
 			int col = e.getX() / squareSize();
-			// TODO: Complete the logic here
+			game.currentPlayerTakesAction(row, col);
+	
+			if(isServer){
+				gameServer.send(game);		
+			}else{
+				gameClient.send(game);
+			}	
+			refreshGui();
 		}
 	}
 	
